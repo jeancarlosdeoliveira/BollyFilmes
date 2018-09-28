@@ -44,7 +44,8 @@ public class MainFragment extends Fragment {
         final ArrayList<ItemFilme> arrayList = new ArrayList<>();
 
         arrayList.add(new ItemFilme("Homem Aranha", "Filme de herói picado por" +
-                "uma aranha", "10/04/2016", 4));
+                "uma aranha que lhe confere super poderes",
+                "10/04/2016", 4));
 
         arrayList.add(new ItemFilme("A Bela e a Fera", "Moradora de uma pequena " +
                 "aldeia francesa, Bela (Emma Watson) tem o pai capturado pela Fera (Dan Stevens) " +
