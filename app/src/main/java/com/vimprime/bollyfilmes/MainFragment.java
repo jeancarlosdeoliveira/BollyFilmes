@@ -3,6 +3,7 @@ package com.vimprime.bollyfilmes;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,7 +18,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainFragment extends Fragment {
 
@@ -43,32 +51,6 @@ public class MainFragment extends Fragment {
         list = view.findViewById(R.id.list_filmes);
         final ArrayList<ItemFilme> arrayList = new ArrayList<>();
 
-        arrayList.add(new ItemFilme("Homem Aranha", "Filme de herói picado por" +
-                "uma aranha que lhe confere super poderes",
-                "10/04/2016", 4));
-
-        arrayList.add(new ItemFilme("A Bela e a Fera", "Moradora de uma pequena " +
-                "aldeia francesa, Bela (Emma Watson) tem o pai capturado pela Fera (Dan Stevens) " +
-                "e decide entregar sua vida ao estranho ser em troca da liberdade dele. " +
-                "No castelo, ela conhece objetos mágicos e descobre que a Fera é, na verdade, " +
-                "um príncipe que precisa de amor para voltar à forma humana.",
-                "01/01/2018", 3.5f));
-
-        arrayList.add(new ItemFilme("Homem Cobra", "Filme de herói picado por" +
-                "uma cobra", "1/05/2016", 2));
-
-        arrayList.add(new ItemFilme("Homem Formiga", "Filme de herói picado por" +
-                "uma formiga", "10/06/2016", 3));
-
-        arrayList.add(new ItemFilme("Homem Javali", "Filme de herói mordido por" +
-                "um Javali", "10/07/2016", 5));
-
-        arrayList.add(new ItemFilme("Homem Passaro", "Filme de herói picado por" +
-                "um pássaro", "10/07/2016", 3.5f));
-
-        arrayList.add(new ItemFilme("Homem Gato", "Filme de herói mordido por" +
-                "um gato", "10/08/2016", 2.5f));
-
         adapter = new FilmesAdapter(getContext(), arrayList);
         adapter.setUseFilmeDestaque(useFilmeDestaque);
         list.setAdapter(adapter);
@@ -86,6 +68,9 @@ public class MainFragment extends Fragment {
         if ( savedInstanceState != null && savedInstanceState.containsKey(KEY_POSICAO)) {
             posicaoItem = savedInstanceState.getInt(KEY_POSICAO);
         }
+
+        new FilmesAsyncTask().execute();
+
         return view;
     }
 
@@ -116,6 +101,7 @@ public class MainFragment extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.menu_Atualizar:
+                new FilmesAsyncTask().execute();
                 Toast.makeText(getContext(), "Atualizando os filmes...", Toast.LENGTH_LONG).show();
                 return true;
             case R.id.menu_Sobre:
@@ -132,6 +118,71 @@ public class MainFragment extends Fragment {
 
         if (adapter != null) {
             adapter.setUseFilmeDestaque(useFilmeDestaque);
+        }
+    }
+
+    public class FilmesAsyncTask extends AsyncTask<Void, Void, List<ItemFilme>> {
+
+        @Override
+        protected List<ItemFilme> doInBackground(Void... integers) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            try {
+                String urlBase = "https://api.themoviedb.org/3/movie/popular?";
+                String apiKey = "api_key";
+                String language = "language";
+
+                Uri uriApi = Uri.parse(urlBase).buildUpon()
+                        .appendQueryParameter(apiKey, BuildConfig.TMDB_API_KEY)
+                        .appendQueryParameter(language, "pt-BR")
+                        .build();
+
+                URL url = new URL(uriApi.toString());
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+                if ( inputStream == null )
+                    return null;
+
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String linha;
+                StringBuffer buffer = new StringBuffer();
+
+                while ((linha = reader.readLine()) != null) {
+                    buffer.append(linha);
+                    buffer.append("\n");
+                }
+
+                List<ItemFilme> list = JsonUtil.fromJsonToList(buffer.toString());
+                return list;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<ItemFilme> itemFilmes) {
+            adapter.clear();
+            adapter.addAll(itemFilmes);
+            adapter.notifyDataSetChanged();
+            //super.onPostExecute(itemFilmes);
         }
     }
 
