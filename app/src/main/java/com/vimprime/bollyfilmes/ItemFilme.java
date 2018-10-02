@@ -71,11 +71,12 @@ public class ItemFilme implements Serializable {
 
     private String buildPath(String width, String path) {
         StringBuilder builder = new StringBuilder();
-        builder.append("http://image.tmdb.org/t/p")
+        builder.append("http://image.tmdb.org/t/p/")
                 .append(width)
                 .append(path);
 
-        return builder.toString();
+        String pathBuilder = builder.toString();
+        return pathBuilder;
     }
 
     public long getId() {

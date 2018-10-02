@@ -62,6 +62,7 @@ public class FilmesAdapter extends ArrayAdapter<ItemFilme> {
                 break;
             }
             case VIEW_TYPE_ITEM: {
+                // cada item de filme apresentado na list principal do app
                 itemView = LayoutInflater.from(getContext()).inflate(R.layout.item_filme,
                             parent, false);
 
