@@ -4,11 +4,16 @@
     <item
         android:id="@+id/menu_Atualizar"
         android:orderInCategory="100"
-        android:title="Atualizar"
+        android:title="@string/menu_atualizar_label"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_Config"
+        android:orderInCategory="200"
+        android:title="@string/menu_config_label"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_Sobre"
-        android:orderInCategory="200"
+        android:orderInCategory="300"
         android:title="Sobre..."
         app:showAsAction="never" />
 
