@@ -41,7 +41,6 @@ public class MainFragment extends Fragment {
     private ListView list;
     private boolean useFilmeDestaque = false;
     FilmesAdapter adapter;
-    FilmesDBHelper dbHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,8 +75,6 @@ public class MainFragment extends Fragment {
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_POSICAO)) {
             posicaoItem = savedInstanceState.getInt(KEY_POSICAO);
         }
-
-        dbHelper = new FilmesDBHelper(getContext());
 
         new FilmesAsyncTask().execute();
 
@@ -197,7 +194,8 @@ public class MainFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<ItemFilme> itemFilmes) {
-            SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
+
+
 
             for (ItemFilme itemFilme : itemFilmes) {
                 ContentValues values = new ContentValues();
@@ -211,11 +209,10 @@ public class MainFragment extends Fragment {
                 String where = FilmesContract.FilmeEntry._ID + "=?";
                 String[] whereValues = new String[] {String.valueOf(itemFilme.getId())};
 
-                int update = writableDatabase.update(FilmesContract.FilmeEntry.TABLE_NAME, values,
-                        where, whereValues);
+                int update = getContext().getContentResolver().update(FilmesContract.FilmeEntry.CONTENT_URI, values, where, whereValues);
 
                 if (update == 0) {
-                    writableDatabase.insert(FilmesContract.FilmeEntry.TABLE_NAME, null, values);
+                    getContext().getContentResolver().insert(FilmesContract.FilmeEntry.CONTENT_URI, values);
                 }
             }
 
