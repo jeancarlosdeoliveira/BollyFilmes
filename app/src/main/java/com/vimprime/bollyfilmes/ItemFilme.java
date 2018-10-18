@@ -40,16 +40,20 @@ import android.net.Uri;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ItemFilme implements Serializable {
 
     private long id;
     private String titulo, descricao, dataLancamento, posterPath, capaPath;
-    private float avaliacao;
+    private float avaliacao, popularidade;
 
-    public ItemFilme(long id, String titulo, String descricao, String dataLancamento, String posterPath, String capaPath, float avaliacao) {
+    public ItemFilme(long id, String titulo, String descricao, String dataLancamento,
+                     String posterPath, String capaPath, float avaliacao, float popularidade) {
         this.setId(id);
         this.setTitulo(titulo);
         this.setDescricao(descricao);
@@ -57,6 +61,7 @@ public class ItemFilme implements Serializable {
         this.setPosterPath(posterPath);
         this.setCapaPath(capaPath);
         this.setAvaliacao(avaliacao);
+        this.setPopularidade(popularidade);
     }
 
     public ItemFilme(JSONObject jsonObject) throws JSONException {
@@ -67,6 +72,7 @@ public class ItemFilme implements Serializable {
         this.setPosterPath(jsonObject.getString("poster_path"));
         this.setCapaPath(jsonObject.getString("backdrop_path"));
         this.setAvaliacao((float) jsonObject.getDouble("vote_average"));
+        this.setPopularidade((float) jsonObject.getDouble("popularity"));
     }
 
     private String buildPath(String width, String path) {
@@ -104,6 +110,16 @@ public class ItemFilme implements Serializable {
     }
 
     public String getDataLancamento() {
+
+        Locale locale = new Locale("pt", "BR");
+
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd", locale).parse(dataLancamento);
+            return new SimpleDateFormat("dd/MM/yyyy", locale).format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         return dataLancamento;
     }
 
@@ -134,4 +150,14 @@ public class ItemFilme implements Serializable {
     public void setAvaliacao(float avaliacao) {
         this.avaliacao = avaliacao;
     }
+
+    public float getPopularidade() {
+        return this.popularidade;
+    }
+
+    public void setPopularidade(float popularidade) {
+        this.popularidade = popularidade;
+    }
+
+
 }

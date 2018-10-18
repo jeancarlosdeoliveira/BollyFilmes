@@ -28,7 +28,7 @@
         android:gravity="center"
         android:maxLength="150"
         android:padding="5dp"
-        android:text="Capitão América"
+        android:text="Título"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         android:textStyle="bold" />

@@ -25,6 +25,8 @@
     <!-- Preferencias de Idioma -->
     <string name="prefs_idioma_label">Idioma</string>
     <string name="prefs_idioma_key">idioma</string>
+    <string name="pd_carregando_titulo">Carregando...</string>
+    <string name="pd_carregando_mensagem">Por favor aguarde!</string>
 
     <string-array name="prefs_idioma_values">
         <item>pt-BR</item>
